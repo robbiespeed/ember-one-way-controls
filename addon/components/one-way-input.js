@@ -7,6 +7,7 @@ const {
   assert,
   computed,
   get,
+  set,
   isNone,
   run: { schedule }
 } = Ember;
@@ -48,6 +49,9 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
 
   _processNewValue(value) {
     if (get(this, '_value') !== value) {
+      if (!get(this, '_canMask')) {
+        set(this, '_value', value);
+      }
       invokeAction(this, 'update', value);
     }
 
@@ -66,7 +70,7 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
       actualValue = '';
     }
 
-    if (!isNone(renderedValue) && actualValue.toString() !== renderedValue.toString()) {
+    if (!isNone(actualValue) && !isNone(renderedValue) && actualValue.toString() !== renderedValue.toString()) {
       let element = this.$();
       let rawElement = element.get(0);
 
@@ -110,6 +114,10 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
     }
   }),
 
+  _canMask: computed('positionalParamValue', 'value', function() {
+    return !isNone(get(this, 'positionalParamValue') || get(this, 'value'));
+  }),
+
   _value: computed('positionalParamValue', 'value', {
     get() {
       let value = get(this, 'positionalParamValue');
@@ -117,6 +125,9 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
         value = get(this, 'value');
       }
 
+      return value;
+    },
+    set(key, value) {
       return value;
     }
   })
