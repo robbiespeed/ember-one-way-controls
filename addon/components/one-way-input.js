@@ -21,6 +21,7 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
   ],
 
   NON_ATTRIBUTE_BOUND_PROPS: [
+    'value',
     'keyEvents',
     'classNames',
     'positionalParamValue',
@@ -32,9 +33,9 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
     '27': 'onescape'
   },
 
-  didInsertElement() {
+  didRender() {
     this._super(...arguments);
-    this.$().val(get(this, '_value'));
+    this._syncValue();
   },
 
   change(event) {
@@ -61,7 +62,11 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
     let actualValue = get(this, '_value');
     let renderedValue = this.readDOMAttr('value');
 
-    if (!isNone(actualValue) && !isNone(renderedValue) && actualValue.toString() !== renderedValue.toString()) {
+    if (isNone(actualValue)) {
+      actualValue = '';
+    }
+
+    if (!isNone(renderedValue) && actualValue.toString() !== renderedValue.toString()) {
       let element = this.$();
       let rawElement = element.get(0);
 
@@ -77,6 +82,7 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
       }
 
       element.val(actualValue);
+      rawElement.setAttribute('value', actualValue);
 
       try {
         rawElement.setSelectionRange(start, end);
