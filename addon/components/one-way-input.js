@@ -17,8 +17,7 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
   tagName: 'input',
 
   attributeBindings: [
-    'type',
-    '_value:value'
+    'type'
   ],
 
   NON_ATTRIBUTE_BOUND_PROPS: [
@@ -31,6 +30,11 @@ const OneWayInputComponent = Component.extend(DynamicAttributeBindings, {
   keyEvents: {
     '13': 'onenter',
     '27': 'onescape'
+  },
+
+  didInsertElement() {
+    this._super(...arguments);
+    this.$().val(get(this, '_value'));
   },
 
   change(event) {
